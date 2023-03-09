@@ -1,0 +1,11 @@
+{% include 'base.html' %}
+
+{% block content %}
+      <div style=" height:100%; display:flex; justify-content:center; align-items:center; flex-direction:column;">
+            <h1>Accept Paytm Payment</h1>
+            <form method="post" action="{% url 'payment' %}">
+                {%  csrf_token %}
+                <button style=" border:none; font-size:20px; outline:none; padding:20px; border-radius: 30px; margin-top:20px; cursor: pointer;">Place Order</button>
+            </form>
+      </div>
+{% endblock content %}
