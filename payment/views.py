@@ -4,6 +4,9 @@ import paytmchecksum
 import requests
 import json
 from django.http import HttpResponse
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework import status
 
 import uuid
 
@@ -20,21 +23,22 @@ class HomeView(View):
         return render(request, 'Homepage.html' )
     
 
-class InitiatePayment(View):
+class InitiatePayment(APIView):
     def post(self, request, *args, **kwargs):
         paytmParams = dict()
+        
         paytmParams['body'] = {
             "requestType"   : "Payment",
             "mid"           : PAYTM_MERCHANT_ID,
-            "websiteName"   : "Vecreation",
+            "websiteName"   : "DIYtestingweb",
             "orderId"       : generate_order_id(),
             "callbackUrl"   : "https://<callback URL to be used by merchant>",
             "txnAmount"     : {
-                "value"     : "1.00",
+                "value"     : "500.00",
                 "currency"  : "INR",
             },
             "userInfo"      : {
-                "custId"    : "CUST_001",
+                "custId"    : "nehatkn786@gmail.com",
             },
         }
         checksum = paytmchecksum.generateSignature(json.dumps(paytmParams["body"]), PAYTM_SECRET_KEY)
@@ -46,14 +50,15 @@ class InitiatePayment(View):
         url = f'https://securegw-stage.paytm.in/theia/api/v1/initiateTransaction?mid={PAYTM_MERCHANT_ID}&orderId={paytmParams["body"]["orderId"]}'
 
         response = requests.post(url, data = post_data, headers = {"Content-type": "application/json"}).json()
-        result = {
-            "txToken" : response["body"]["txnToken"],
-            "orderId": paytmParams['body']['orderId'],
-            "amount": paytmParams["body"]["txnAmount"]["value"]
-
-        }
-        print(response["body"]["txnToken"])
-        return render(request, "paymentrequest.html", {"result":result})
+        print(response)
+        # result = {
+        #     "txToken" : response["body"]["txnToken"],
+        #     "orderId": paytmParams['body']['orderId'],
+        #     "amount": paytmParams["body"]["txnAmount"]["value"],
+        # }
+        # return Response({'token':result['txToken'], 'orderId':result['orderId'], 'amout':result['amount']},  status=status.HTTP_200_OK)
+        # return HttpResponse('Its working')
+        return Response(status=status.HTTP_200_OK)
 
 
 
